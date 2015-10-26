@@ -1,4 +1,4 @@
-#!/bin/sh --
+#!/bin/bash
 #
 # Driver for distributed JMeter testing.
 #
@@ -100,7 +100,7 @@ function server_ips() {
 	do
 	
 	  # Get the IP for the current pid
-	  x=$(docker -H tcp://0.0.0.0:$SWARM_PORT inspect --format '{{ .NetworkSettings.IPAddress }}' ${pid})
+	  x=$(docker -H tcp://0.0.0.0:$SWARM_PORT inspect --format '{{ .Node.IP }}' ${pid})
 	
 		# Append to SERVER_IPS
 		if [[ ! -z "${SERVER_IPS}" ]]; then
