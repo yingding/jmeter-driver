@@ -258,8 +258,6 @@ mkdir -p ${LOGDIR}
 ## start the docker client on the local master nodes
 docker -H tcp://0.0.0.0:2375 run --cidfile ${LOGDIR}/cid \
 				-d \
-                                -P ${HOST_READ_PORT}:1099 \
-                                -P ${HOST_WRITE_PORT}:60000 \
                                 -v ${LOGDIR}:/logs \
 				-v ${DATADIR}:/input_data \
 				-v $(dirname ${JMX_SCRIPT}):/scripts \
