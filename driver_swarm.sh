@@ -73,8 +73,8 @@ function start_servers() {
                 # on Swarm docker 
 		docker -H tcp://0.0.0.0:$SWARM_PORT run --cidfile ${LOGDIR}/cid \
 					-d \
-					-p 0.0.0.0:${HOST_READ_PORT}:1099 \
-					-p 0.0.0.0:${HOST_WRITE_PORT}:60000 \
+					-p ${HOST_READ_PORT}:1099 \
+					-p ${HOST_WRITE_PORT}:60000 \
 					-v ${LOGDIR}:/logs \
 					-v ${DATADIR}:/input_data \
 					--name jmeter-server-${n} \
@@ -162,7 +162,7 @@ function stop_servers() {
 # Remove all stopped containers
 function remove_containers() {
 	echo "Removing containers..."
-	docker rm ${CLIENT_NAME}
+	docker -H tcp://0.0.0.0:$SWARM_PORT rm ${CLIENT_NAME}
 	n=1
 	while [[ ${n} -le ${NUM_SERVERS} ]]
 	do
