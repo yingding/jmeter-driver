@@ -101,7 +101,7 @@ function server_ips() {
 	
 	  # Get the IP for the current pid
 	  x=$(docker -H tcp://0.0.0.0:$SWARM_PORT inspect --format '{{ .Node.IP }}' ${pid})
-	
+	  #x=$(docker -H tcp://0.0.0.0:$SWARM_PORT inspect --format '{{ .NetworkSettings.IPAddress }}' ${pid})
 		# Append to SERVER_IPS
 		if [[ ! -z "${SERVER_IPS}" ]]; then
 			SERVER_IPS=${SERVER_IPS},
@@ -122,6 +122,18 @@ function confirm() {
 		y) return ;;
 		n) exit 6;;
 	esac
+}
+
+#
+# Get stop confirmation
+function confirm_stop() {
+        echo "Stop and remove all jmeter container"
+        echo "---------------------------------"
+        read -n 1 -e -p "Stop and remove containers?y/[n]: " yesno
+        case ${yesno} in
+                y) return ;;
+                n) exit 6;;
+        esac
 }
 
 #
@@ -242,7 +254,9 @@ mkdir -p ${LOGDIR}
 ## start the docker client on the local master nodes
 docker -H tcp://0.0.0.0:2375 run --cidfile ${LOGDIR}/cid \
 				-d \
-				-v ${LOGDIR}:/logs \
+                                -p ${HOST_READ_PORT}:1099 \
+                                -p ${HOST_WRITE_PORT}:60000 \
+                                -v ${LOGDIR}:/logs \
 				-v ${DATADIR}:/input_data \
 				-v $(dirname ${JMX_SCRIPT}):/scripts \
 				--name jmeter-client \
@@ -255,6 +269,9 @@ if [[ ${err} -ne 0 ]] ; then
 else
 	wait_for_client
 fi
+
+# Confirm stop and remove server and client container
+confirm_stop
 
 # Shutdown the servers
 stop_servers
