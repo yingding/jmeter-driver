@@ -20,8 +20,10 @@ DATADIR=
 JMX_SCRIPT=
 WORK_DIR=$(readlink -f /tmp)
 NUM_SERVERS=1
-HOST_WRITE_PORT=49500
-HOST_READ_PORT=49501
+#HOST_WRITE_PORT=49500
+HOST_WRITE_PORT=60000
+#HOST_READ_PORT=49501
+HOST_READ_PORT=1099
 # Name of the JMeter client container
 CLIENT_NAME=jmeter-client
 # Prefix of all JMeter server containers.  Actual name will be PREFIX-#
@@ -87,8 +89,8 @@ function start_servers() {
 
 		# Prepare for next server
 	  n=$((${n} + 1))
-		HOST_READ_PORT=$((${HOST_READ_PORT} +  2))
-		HOST_WRITE_PORT=$((${HOST_WRITE_PORT} + 2))
+          #HOST_READ_PORT=$((${HOST_READ_PORT} +  2))
+	  #HOST_WRITE_PORT=$((${HOST_WRITE_PORT} + 2))
 	done
 }
 
@@ -256,6 +258,8 @@ mkdir -p ${LOGDIR}
 ## start the docker client on the local master nodes
 docker -H tcp://0.0.0.0:2375 run --cidfile ${LOGDIR}/cid \
 				-d \
+                                -P ${HOST_READ_PORT}:1099 \
+                                -P ${HOST_WRITE_PORT}:60000 \
                                 -v ${LOGDIR}:/logs \
 				-v ${DATADIR}:/input_data \
 				-v $(dirname ${JMX_SCRIPT}):/scripts \
