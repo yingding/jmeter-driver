@@ -249,18 +249,20 @@ echo "Server IPs are: ${SERVER_IPS}"
 #
 # Start the jmeter (client) container and connect to the servers
 echo "Starting client..."
+echo "HOST_READ_PORT : ${HOST_READ_PORT}"
+echo "HOST_WRITE_PORT: ${HOST_WRITE_PORT}"
 LOGDIR=${WORK_DIR}/client
 mkdir -p ${LOGDIR}
 ## start the docker client on the local master nodes
 docker -H tcp://0.0.0.0:2375 run --cidfile ${LOGDIR}/cid \
 				-d \
-                                -p ${HOST_READ_PORT}:1099 \
-                                -p ${HOST_WRITE_PORT}:60000 \
+#                                -p ${HOST_READ_PORT}:1099 \
+#                                -p ${HOST_WRITE_PORT}:60000 \
                                 -v ${LOGDIR}:/logs \
 				-v ${DATADIR}:/input_data \
 				-v $(dirname ${JMX_SCRIPT}):/scripts \
 				--name jmeter-client \
-				${CLIENT_IMAGE} -n -t /scripts/$(basename ${JMX_SCRIPT}) -l /logs/${JTL_FILE} -LDEBUG -R${SERVER_IPS} 2>/dev/null 1>&2
+				${CLIENT_IMAGE} -n -t /scripts/$(basename ${JMX_SCRIPT}) -l /logs/${JTL_FILE} -LDEBUG -R ${SERVER_IPS} 2>/dev/null 1>&2
 
 err=$?
 if [[ ${err} -ne 0 ]] ; then
